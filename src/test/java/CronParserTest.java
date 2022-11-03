@@ -77,10 +77,24 @@ public class CronParserTest {
     }
 
     @Test
-    void testInvalidCronExpressionWithRangeOutsideAllowed() {
+    void testInvalidCronExpressionWithSingleValueOutsideAllowedRange() {
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> CronParser.parse(
+                "60 * * * * command"));
+        assertThat(exception.getMessage(), Matchers.equalTo("60 outside allowed range for minute"));
+    }
+
+    @Test
+    void testInvalidCronExpressionWithCSVValueOutsideAllowedRange() {
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> CronParser.parse(
+                "1,60 * * * * command"));
+        assertThat(exception.getMessage(), Matchers.equalTo("60 outside allowed range for minute"));
+    }
+
+    @Test
+    void testInvalidCronExpressionWithRangeOutsideAllowedRange() {
         Exception exception = assertThrows(IllegalArgumentException.class, () -> CronParser.parse(
                 "1-60 * * * * command"));
-        assertThat(exception.getMessage(), Matchers.equalTo("1-60 outside allowed range for minute"));
+        assertThat(exception.getMessage(), Matchers.equalTo("60 outside allowed range for minute"));
     }
 
     @Test

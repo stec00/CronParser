@@ -33,7 +33,7 @@ public class CronParser {
         // Check for numeric: xy... where xy... are digits
         Matcher matcher = Pattern.compile("^\\d+$").matcher(part);
         if (matcher.find()) {
-            addValue(part, values, part, cronPart);
+            addValue(Integer.parseInt(part), values, part, cronPart);
             return values;
         }
 
@@ -58,7 +58,7 @@ public class CronParser {
         if (matcher.find()) {
             String[] valuesAsStrings = part.split(",");
             Arrays.stream(valuesAsStrings).forEach(value -> {
-                addValue(value, values, part, cronPart);
+                addValue(Integer.parseInt(value), values, part, cronPart);
             });
             return values;
         }
@@ -71,12 +71,9 @@ public class CronParser {
             if (minValue > maxValue) {
                 throw new IllegalArgumentException(String.format("Invalid range %s for %s", part,
                         cronPart.getName()));
-            } else if (minValue < cronPart.getMinValue() || maxValue > cronPart.getMaxValue()) {
-                throw new IllegalArgumentException(String.format("%s outside allowed range for %s", part,
-                        cronPart.getName()));
             }
             for (int value = minValue; value <= maxValue; value++) {
-                values.add(value);
+                addValue(value, values, part, cronPart);
             }
             return values;
         }
@@ -85,12 +82,11 @@ public class CronParser {
                 cronPart.getName(), part));
     }
 
-    private static void addValue(String valueAsString, List<Object> values, String part, CronPart cronPart) {
-        int value = Integer.parseInt(valueAsString);
+    private static void addValue(int value, List<Object> values, String part, CronPart cronPart) {
         if (value >= cronPart.getMinValue() && value <= cronPart.getMaxValue()) {
             values.add(value);
         } else {
-            throw new IllegalArgumentException(String.format("%s outside allowed range for %s", part,
+            throw new IllegalArgumentException(String.format("%s outside allowed range for %s", value,
                     cronPart.getName()));
         }
     }
